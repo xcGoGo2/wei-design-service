@@ -8,24 +8,23 @@ import com.design.weidesignservice.entity.User;
 import com.design.weidesignservice.result.ResultDTO;
 import com.design.weidesignservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.Map;
 
 @RestController
-@RequestMapping("design/user")
+@RequestMapping("design/api/user")
 public class UserController {
 
     @Autowired
     UserService userService;
 
     //实现注册功能
-    @RequestMapping(value = "/register",method = RequestMethod.POST)
+    @PostMapping("/register")
+    @PassToken
     public ResultDTO register(User user){
         String username = user.getUsername();
         String password = user.getPassword();
@@ -34,14 +33,14 @@ public class UserController {
     }
 
     /**
-     * 用户登录
-     * @param user
+     *
+     * @param params
      * @return
      */
     @PostMapping("/login")
     @PassToken
-    public ResultDTO login( User user){
-        return userService.login(user.getUsername(), user.getPassword());
+    public ResultDTO login(@RequestBody Map<String, String> params){
+        return userService.login(params.get("username"), params.get("password"));
     }
 
     @GetMapping("/hello")
