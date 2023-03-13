@@ -14,6 +14,7 @@ import com.design.weidesignservice.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import com.design.weidesignservice.util.UUIDUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +34,29 @@ public class UserService {
 
     public User findUserById(String userId) {
         return userMapper.findUserById(userId);
+    }
+
+    public ResultDTO Insert(String username, String password, String showName) {
+        Map<String, Object> respMap = new HashMap<>();
+        String Id = UUIDUtil.getUUID();
+        User user = null;
+        try {
+            User user1 = userMapper.findByUsername(username);
+            if(user1 != null) {
+                return ResultDTO.failure(new ResultError(UserError.EMP_IS_EXIT));
+            }
+            userMapper.insert(Id, username, password, showName);
+
+            user = userMapper.findUserById(Id);
+            // 如果没查到新增的用户信息
+            if(user == null) {
+                return ResultDTO.failure(new ResultError(UserError.EMP_INSERT_ERROR));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        respMap.put("user", user);
+        return ResultDTO.success(respMap, "注册成功！");
     }
 
     public ResultDTO login(String name, String password) {
@@ -57,11 +81,11 @@ public class UserService {
                 return ResultDTO.failure(new ResultError(UserError.PASSWORD_OR_NAME_IS_ERROR));
             }
             tokenMap.put("token", token);
-            tokenMap.put("user",user);
+            tokenMap.put("user", user);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return ResultDTO.success(tokenMap);
+        return ResultDTO.success(tokenMap, "登录成功");
     }
 
 }

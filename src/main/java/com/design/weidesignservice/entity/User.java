@@ -1,11 +1,13 @@
 package com.design.weidesignservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Created by le.bai on 2020-04-17 20:40
+ * 用户实体类
  */
 @Data
 @AllArgsConstructor
@@ -13,5 +15,8 @@ import lombok.NoArgsConstructor;
 public class User {
     String Id;
     String username;
+    @JsonIgnore
     String password;
+    String showName;
+    String loginDate;
 }

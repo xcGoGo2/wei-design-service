@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @RestController
 @RequestMapping("design/user")
@@ -20,6 +24,14 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    //实现注册功能
+    @RequestMapping(value = "/register",method = RequestMethod.POST)
+    public ResultDTO register(User user){
+        String username = user.getUsername();
+        String password = user.getPassword();
+        String showName = user.getShowName();
+        return userService.Insert(username, password, showName);
+    }
 
     /**
      * 用户登录

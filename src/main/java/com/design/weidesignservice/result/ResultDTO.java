@@ -11,6 +11,7 @@ public class ResultDTO<T> extends com.design.weidesignservice.result.AbstractRes
     private static final long serialVersionUID = 1668914867578552488L;
     @ApiModelProperty(value = "业务数据", position = 1)
     private T data;
+    private String message;
 
     @JsonInclude(Include.NON_NULL)
     @JsonProperty(value = "data", index = 2)
@@ -22,6 +23,14 @@ public class ResultDTO<T> extends com.design.weidesignservice.result.AbstractRes
         this.data = data;
     }
 
+    private void setMessage(String msg) {
+        this.message = msg;
+    }
+    @JsonProperty(value = "message", index = 3)
+    public String getMessage() {
+        return this.message;
+    }
+
     public ResultDTO() {
     }
 
@@ -30,8 +39,7 @@ public class ResultDTO<T> extends com.design.weidesignservice.result.AbstractRes
     }
 
     public static <T> ResultDTO<T> success() {
-        ResultDTO<T> result = new ResultDTO<T>(Status.success);
-        return result;
+        return new ResultDTO<T>(Status.success);
     }
 
     public static <T> ResultDTO<T> failure(com.design.weidesignservice.result.ResultError... errors) {
@@ -40,9 +48,16 @@ public class ResultDTO<T> extends com.design.weidesignservice.result.AbstractRes
         return result;
     }
 
-    public static <T> ResultDTO<T> success(T data) {
+    /**
+     *
+     * @param data 返回数据
+     * @param msg 返回信息
+     * @return ResultDTO
+     */
+    public static <T> ResultDTO<T> success(T data, String msg) {
         ResultDTO<T> result = new ResultDTO<T>(Status.success);
         result.setData(data);
+        result.setMessage(msg);
         return result;
     }
 

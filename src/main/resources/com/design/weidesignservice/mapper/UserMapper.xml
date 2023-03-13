@@ -11,4 +11,9 @@
       where
       id=#{Id}
     </select>
+    <insert id="insert" parameterType="com.design.weidesignservice.entity.User">
+        INSERT INTO user
+            (id, username, password, showName)
+        VALUES(#{Id}, #{username}, #{password}, #{showName});
+    </insert>
 </mapper>

@@ -4,9 +4,10 @@ import com.design.weidesignservice.entity.User;
 import org.apache.ibatis.annotations.Param;
 
 /**
- * Created by le.bai on 2020-04-17 20:50
+ *
  */
 public interface UserMapper {
     User findByUsername(@Param("username") String username);
     User findUserById(@Param("Id") String Id);
+    void insert(@Param("Id") String Id, @Param("username") String username, @Param("password") String password, @Param("showName") String showName);
 }

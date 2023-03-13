@@ -16,7 +16,8 @@ public enum UserError {
     TOKEN_IS_EXPIRED("40008","令牌已过期"),
 
     NONE_TOKEN("00001", "无token,请重新登录"),
-    TOKEN_CHECK_ERROR("00002", "token校验失败")
+    TOKEN_CHECK_ERROR("00002", "token校验失败"),
+    EMP_INSERT_ERROR("00003", "插入数据库失败")
     ;
     String errorCode;
     String errorMessage;
