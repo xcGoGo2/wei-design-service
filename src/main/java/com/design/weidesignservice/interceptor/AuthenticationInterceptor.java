@@ -37,7 +37,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object object) throws Exception {
         // 从 http 请求头中取出 token
-        String token = httpServletRequest.getHeader("token");
+        String token = httpServletRequest.getHeader("design.token");
         // 如果不是映射到方法直接通过
         if(!(object instanceof HandlerMethod)){
             return true;
@@ -46,105 +46,55 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         Method method=handlerMethod.getMethod();
 
         PrintWriter out = null ;
-        //检查有没有需要用户权限的注解
-//        if (method.isAnnotationPresent(TokenRequired.class)) {
-//            TokenRequired userLoginToken = method.getAnnotation(TokenRequired.class);
-//            if (userLoginToken.required()) {
-//                // 执行认证
-//                if (token == null) {
-//                    out = httpServletResponse.getWriter();
-//                    out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.NONE_TOKEN))));
-//                    return false;
-//                }
-//                // 获取 token 中的 user id
-//                String userId;
-//                try {
-//                    userId = JWT.decode(token).getClaim("userId").asString();
-//                } catch (JWTDecodeException j) {
-//                    out = httpServletResponse.getWriter();
-//                    out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.TOKEN_CHECK_ERROR))));
-//                    return false;
-//                }
-//                //查询token中登录用户数据库中是否存在
-//                User user = userMapper.findUserById(userId);
-//                if (user == null) {
-//                    out = httpServletResponse.getWriter();
-//                    out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.EMP_IS_NULL_EXIT))));
-//                    return false;
-//                }
-//                // 验证 token
-//                try {
-//                    if (!JwtUtil.verity(token, user.getPassword())) {
-//                        //如果token检验失败,查询redis中是否存在，redis为空，用户重新登录
-//                        if (redisUtils.get("userToken-" + user.getId()) == null) {
-//                            out = httpServletResponse.getWriter();
-//                            out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.TOKEN_IS_VERITYED))));
-//                            return false;
-//                        }
-//                        //如果redis不为空，刷新token
-//                        String reToken = JwtUtil.sign(user.getUsername(),user.getId(),user.getPassword());
-//                        //将刷新后的token保存在redis中
-//                        redisUtils.set("userToken-" + user.getId(), reToken, 2L * 60);
-//                        out = httpServletResponse.getWriter();
-//                        out.append(JSON.toJSONString(ResultDTO.failure(reToken,new ResultError(UserError.TOKEN_IS_EXPIRED))));
-//                        return false;
-//                    }
-//                } catch (Exception e) {
-//                    out = httpServletResponse.getWriter();
-//                    out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.TOKEN_CHECK_ERROR))));
-//                    return false;
-//                }
-//            }
-//        }
-        if (method.isAnnotationPresent(PassToken.class)) {
-            PassToken userLoginToken = method.getAnnotation(PassToken.class);
-            if (!userLoginToken.required()) {
-                // 执行认证
-                if (token == null) {
-                    out = httpServletResponse.getWriter();
-                    out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.NONE_TOKEN))));
-                    return false;
-                }
-                // 获取 token 中的 user id
-                String userId;
-                try {
-                    userId = JWT.decode(token).getClaim("userId").asString();
-                } catch (JWTDecodeException j) {
-                    out = httpServletResponse.getWriter();
-                    out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.TOKEN_CHECK_ERROR))));
-                    return false;
-                }
-                //查询token中登录用户数据库中是否存在
-                User user = userMapper.findUserById(userId);
-                if (user == null) {
-                    out = httpServletResponse.getWriter();
-                    out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.EMP_IS_NULL_EXIT))));
-                    return false;
-                }
-                // 验证 token
-                try {
-                    if (!JwtUtil.verity(token, user.getPassword())) {
-                        //如果token检验失败,查询redis中是否存在，redis为空，用户重新登录
-                        if (redisUtils.get("userToken-" + user.getId()) == null) {
-                            out = httpServletResponse.getWriter();
-                            out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.TOKEN_IS_VERITYED))));
-                            return false;
-                        }
-                        //如果redis不为空，刷新token
-                        String reToken = JwtUtil.sign(user.getUsername(),user.getId(),user.getPassword());
-                        //将刷新后的token保存在redis中
-                        redisUtils.set("userToken-" + user.getId(), reToken, 2L * 60);
+
+        // 没有加上 passToken 注解
+        if (!method.isAnnotationPresent(PassToken.class)) {
+            // 执行认证
+            if (token == null) {
+                out = httpServletResponse.getWriter();
+                out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.NONE_TOKEN))));
+                return false;
+            }
+            // 获取 token 中的 user id
+            String userId;
+            try {
+                userId = JWT.decode(token).getClaim("userId").asString();
+            } catch (JWTDecodeException j) {
+                out = httpServletResponse.getWriter();
+                out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.TOKEN_CHECK_ERROR))));
+                return false;
+            }
+            //查询token中登录用户数据库中是否存在
+            User user = userMapper.findUserById(userId);
+            if (user == null) {
+                out = httpServletResponse.getWriter();
+                out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.EMP_IS_NULL_EXIT))));
+                return false;
+            }
+            // 验证 token
+            try {
+                if (!JwtUtil.verity(token, user.getPassword())) {
+                    //如果token检验失败,查询redis中是否存在，redis为空，用户重新登录
+                    if (redisUtils.get("userToken-" + user.getId()) == null) {
                         out = httpServletResponse.getWriter();
-                        out.append(JSON.toJSONString(ResultDTO.failure(reToken,new ResultError(UserError.TOKEN_IS_EXPIRED))));
+                        out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.TOKEN_IS_VERITYED))));
                         return false;
                     }
-                } catch (Exception e) {
+                    //如果redis不为空，刷新token
+                    String reToken = JwtUtil.sign(user.getUsername(),user.getId(),user.getPassword());
+                    //将刷新后的token保存在redis中
+                    redisUtils.set("userToken-" + user.getId(), reToken, 2L * 60);
                     out = httpServletResponse.getWriter();
-                    out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.TOKEN_CHECK_ERROR))));
+                    out.append(JSON.toJSONString(ResultDTO.failure(reToken,new ResultError(UserError.TOKEN_IS_EXPIRED))));
                     return false;
                 }
+            } catch (Exception e) {
+                out = httpServletResponse.getWriter();
+                out.append(JSON.toJSONString(ResultDTO.failure(new ResultError(UserError.TOKEN_CHECK_ERROR))));
+                return false;
             }
         }
+        // 加上后
         return true;
     }
 

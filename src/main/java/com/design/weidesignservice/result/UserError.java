@@ -17,7 +17,10 @@ public enum UserError {
 
     NONE_TOKEN("00001", "无token,请重新登录"),
     TOKEN_CHECK_ERROR("00002", "token校验失败"),
-    EMP_INSERT_ERROR("00003", "插入数据库失败")
+    EMP_INSERT_ERROR("00003", "插入数据库失败"),
+
+    // MenuError
+    MENU_CHECK_ERROR("00002", "查询菜单失败")
     ;
     String errorCode;
     String errorMessage;
